@@ -9,13 +9,13 @@ class Blog extends Component {
   state = {
     posts: [],
     selectedId: null,
+    error: false,
   };
 
   componentDidMount() {
     axios
-      .get('https://jsonplaceholder.typicode.com/posts')
+      .get('/posts')
       .then(response => {
-        console.log('[Blog]', response);
         const posts = response.data.slice(0, 4);
         const updatedPosts = posts.map(post => ({
           ...post,
@@ -26,7 +26,9 @@ class Blog extends Component {
         });
       })
       .catch(err => {
-        console.error(err);
+        this.setState({
+          error: true,
+        });
       });
   }
 
@@ -39,11 +41,16 @@ class Blog extends Component {
         onClick={() => this._onPostClicked(post.id)}
       />
     ));
+
     return (
       <div>
         <section className="Posts">{posts}</section>
         <section>
-          <FullPost id={this.state.selectedId} />
+          {
+            this.state.error ?
+              <div style={{ textAlign: 'center' }}><p>Something went wrong!</p></div>
+              : <FullPost id={this.state.selectedId} />
+          }
         </section>
         <section>
           <NewPost />
